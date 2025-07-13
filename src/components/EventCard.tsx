@@ -51,7 +51,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, onEdit, onDelete }) => {
         <div className="grid grid-cols-1 gap-3 text-sm">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-blue-500" />
-            {console.log(event.dateInit, event.dateEnd)}
             <span>{formatDate(event.dateInit)}</span> -
             <span>{formatDate(event.dateEnd)}</span>
           </div>

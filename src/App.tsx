@@ -1,9 +1,10 @@
-import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import EventoPage from "./pages/Evento/EventoPage";
 import LoginForm from "./components/LoginForm";
 import NotFound from "./pages/NotFound";
+import Layout from "./pages/Layout";
+import "./App.css";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
@@ -23,7 +24,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <LoginForm />;
   }
 
-  return <>{children}</>;
+  return <Layout>{children}</Layout>;
 };
 
 const AppRoutes = () => {
