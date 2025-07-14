@@ -7,13 +7,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useMockData } from "@/hooks/useMockData";
+import { useEventos } from "@/hooks/useEventos";
 import type { Event } from "@/types";
 import { Calendar, Plus } from "lucide-react";
 import { useState } from "react";
 
 function EventoPage() {
-  const { events, updateEvent, addEvent } = useMockData();
+  const { events, addEvent, updateEvent, deleteEvent } = useEventos();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,7 +30,9 @@ function EventoPage() {
 
   const onDeleteEvent = (event: Event) => {
     // Implement delete logic here
+
     console.log("Delete event:", event);
+    deleteEvent(event.id);
   };
 
   const onSubmit = (data: any) => {
@@ -80,7 +82,7 @@ function EventoPage() {
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               Nenhum evento encontrado
             </h3>
-            <Button onClick={() => {}} className="gap-2">
+            <Button onClick={() => { }} className="gap-2">
               <Plus className="h-4 w-4" />
               Criar Primeiro Evento
             </Button>

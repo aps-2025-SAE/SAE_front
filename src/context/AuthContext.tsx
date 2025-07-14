@@ -1,14 +1,13 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
-export type UserRole = 'administrator' | 'secretary';
 
 export interface User {
-  id: string;
-  name: string;
+  id: number;
+  nome: string;
   email: string;
-  role: UserRole;
-  avatar?: string;
+  login: string;
 }
 
 interface AuthContextType {
@@ -20,27 +19,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock users for demonstration
-const mockUsers: Record<string, { password: string; user: User }> = {
-  'admin@eventos.com': {
-    password: 'admin123',
-    user: {
-      id: '1',
-      name: 'Administrador',
-      email: 'admin@eventos.com',
-      role: 'administrator',
-    },
-  },
-  'secretario@eventos.com': {
-    password: 'sec123',
-    user: {
-      id: '2',
-      name: 'Secretário',
-      email: 'secretario@eventos.com',
-      role: 'secretary',
-    },
-  },
-};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -59,18 +37,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
 
     // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const mockUser = mockUsers[email];
-    if (mockUser && mockUser.password === password) {
-      setUser(mockUser.user);
-      localStorage.setItem('user', JSON.stringify(mockUser.user));
+    try {
+      const response = await axios.post('https://saeback-production.up.railway.app/api/login', { login: email, senha: password });
+      console.log('Login API response:', response.data);
+      const userData: User = response.data.administrador;
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
       setIsLoading(false);
       return true;
+    } catch (error) {
+      console.log('Login API error:', error);
+      setIsLoading(false);
+      return false;
     }
 
-    setIsLoading(false);
-    return false;
+
   };
 
   const logout = () => {

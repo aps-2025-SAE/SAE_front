@@ -1,0 +1,83 @@
+import type { Event } from "@/types";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { format } from "date-fns";
+
+export const useEventos = () => {
+    const [events, setEvents] = useState<Event[]>([]);
+
+    useEffect(() => {
+        getEvents();
+    }, [])
+
+    const getEvents = async () => {
+        try {
+            const response = await axios.get<any[]>("https://saeback-production.up.railway.app/api/eventos");
+            console.log("Fetched events:", response.data);
+            setEvents(response.data.map(evento => ({
+                id: evento.id,
+                title: evento.tipo,
+                budget: evento.valor,
+                description: evento.descricao,
+                dateInit: new Date(evento.datas).toISOString(),
+                dateEnd: new Date(evento.datas).toISOString(),
+                diaryOffers: evento.numOfertasDiarias
+            } as Event)));
+
+        } catch (error) {
+            console.error("Error fetching events:", error);
+        }
+    }
+
+
+    const addEvent = async (event: Event) => {
+        try {
+            const response = await axios.post<Event>("https://saeback-production.up.railway.app/api/eventos", {
+                tipo: event.title,
+                valor: event.budget,
+                descricao: event.description,
+                datas: format(event.dateInit, "yyyy-MM-dd"),
+                numOfertasDiarias: event.diaryOffers,
+            });
+            console.log("Event added:", response.data);
+            await getEvents(); // Refresh the list after adding
+        } catch (error) {
+            console.error("Error adding event:", error);
+        }
+    }
+
+    const updateEvent = async (id: string, event: Event) => {
+        try {
+            const response = await axios.put<Event>(`https://saeback-production.up.railway.app/api/eventos/${id}`, {
+                tipo: event.title,
+                valor: event.budget,
+                descricao: event.description,
+                datas: format(event.dateInit, "yyyy-MM-dd"),
+                numOfertasDiarias: event.diaryOffers,
+            });
+            console.log("Event added:", response.data);
+            await getEvents(); // Refresh the list after adding
+        } catch (error) {
+            console.error("Error adding event:", error);
+        }
+    }
+
+    const deleteEvent = async (id: string) => {
+        try {
+            await axios.delete(`https://saeback-production.up.railway.app/api/eventos/${id}`);
+            console.log("Event deleted:", id);
+            await getEvents(); // Refresh the list after deleting
+        }
+        catch (error) {
+            console.error("Error deleting event:", error);
+        }
+    }
+
+    return {
+        events,
+        getEvents,
+        addEvent,
+        updateEvent,
+        deleteEvent
+    }
+}

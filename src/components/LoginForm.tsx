@@ -51,11 +51,10 @@ const LoginForm = () => {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                                    Email
+                                    Login
                                 </Label>
                                 <Input
                                     id="email"
-                                    type="email"
                                     placeholder="seu@email.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
