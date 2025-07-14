@@ -5,6 +5,7 @@ import LoginForm from "./components/LoginForm";
 import NotFound from "./pages/NotFound";
 import Layout from "./pages/Layout";
 import "./App.css";
+import Default from "./pages/Evento/Default";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
@@ -30,7 +31,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/eventos" replace />} />
+      <Route path="/" element={<Navigate to="/default" replace />} />
+      <Route path="/default" element={
+        <ProtectedRoute>
+          <Default />
+        </ProtectedRoute>
+      } />
       <Route path="/eventos" element={
         <ProtectedRoute>
           <EventoPage />
