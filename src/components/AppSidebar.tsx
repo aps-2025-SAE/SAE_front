@@ -2,18 +2,13 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { 
-  LayoutDashboard, 
-  Calendar, 
-  Users, 
-  Settings, 
-  FileText,
-  BarChart3,
-  MessageSquare,
-  Bell
+import {
+  Calendar
 } from "lucide-react"
+import { useAuth } from "@/context/AuthContext";
 
 export function AppSidebar() {
+  const { user } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   const menuItems = [
@@ -33,7 +28,7 @@ export function AppSidebar() {
             <a href="/default">
               Gestão de Eventos
             </a>
-            
+
           </h2>
         )}
         <Button
@@ -42,10 +37,10 @@ export function AppSidebar() {
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="ml-auto"
         >
-          <svg 
-            className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -86,7 +81,7 @@ export function AppSidebar() {
                 Usuário
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                usuario@email.com
+                {user?.email || ""}
               </p>
             </div>
           )}

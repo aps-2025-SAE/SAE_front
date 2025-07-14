@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
 
-import { Eye, EyeOff, Calendar, Shield } from 'lucide-react';
+import { Eye, EyeOff, Calendar } from 'lucide-react';
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
@@ -94,18 +94,7 @@ const LoginForm = () => {
                             </Button>
                         </form>
 
-                        <div className="mt-8 pt-6 border-t border-gray-100">
-                            <div className="text-sm text-gray-600 space-y-2">
-                                <div className="flex items-center gap-2">
-                                    <Shield className="w-4 h-4" />
-                                    <span className="font-medium">Credenciais de teste:</span>
-                                </div>
-                                <div className="pl-6 space-y-1">
-                                    <p><strong>Admin:</strong> admin@eventos.com / admin123</p>
-                                    <p><strong>Secretário:</strong> secretario@eventos.com / sec123</p>
-                                </div>
-                            </div>
-                        </div>
+
                     </CardContent>
                 </Card>
             </div>
