@@ -1,3 +1,4 @@
+import AlertConfirmation from "@/components/AlertConfirmation";
 import EventCard from "@/components/EventCard";
 import EventForm from "@/components/EventForm";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ function EventoPage() {
   const { events, addEvent, updateEvent, deleteEvent } = useEventos();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [deletingEvent, setDeletingEvent] = useState<Event | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onCreateEvent = () => {
@@ -30,9 +32,9 @@ function EventoPage() {
 
   const onDeleteEvent = (event: Event) => {
     // Implement delete logic here
-
+    setDeletingEvent(event);
     console.log("Delete event:", event);
-    deleteEvent(event.id);
+
   };
 
   const onSubmit = (data: any) => {
@@ -113,6 +115,18 @@ function EventoPage() {
           />
         </DialogContent>
       </Dialog>
+      <AlertConfirmation
+        title="Excluir Evento"
+        message="Você tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita."
+        onConfirm={() => {
+          if (deletingEvent) {
+            deleteEvent(deletingEvent.id);
+            setDeletingEvent(null);
+          }
+        }}
+        onCancel={() => setDeletingEvent(null)}
+        open={!!deletingEvent}
+      />
     </div>
   );
 }

@@ -19,8 +19,8 @@ export const useEventos = () => {
                 title: evento.tipo,
                 budget: evento.valor,
                 description: evento.descricao,
-                dateInit: new Date(evento.datas).toISOString(),
-                dateEnd: new Date(evento.datas).toISOString(),
+                dateInit: new Date(evento.data_inicio).toISOString(),
+                dateEnd: new Date(evento.data_fim).toISOString(),
                 diaryOffers: evento.numOfertasDiarias
             } as Event)));
 
@@ -36,12 +36,14 @@ export const useEventos = () => {
                 tipo: event.title,
                 valor: event.budget,
                 descricao: event.description,
-                datas: format(event.dateInit, "yyyy-MM-dd"),
+                data_inicio: format(event.dateInit, "yyyy-MM-dd"),
+                data_fim: format(event.dateEnd, "yyyy-MM-dd"),
                 numOfertasDiarias: event.diaryOffers,
             });
             console.log("Event added:", response.data);
             await getEvents(); // Refresh the list after adding
         } catch (error) {
+            alert("Erro ao adicionar evento. Verifique os dados e tente novamente.");
             console.error("Error adding event:", error);
         }
     }
@@ -52,12 +54,14 @@ export const useEventos = () => {
                 tipo: event.title,
                 valor: event.budget,
                 descricao: event.description,
-                datas: format(event.dateInit, "yyyy-MM-dd"),
+                data_inicio: format(event.dateInit, "yyyy-MM-dd"),
+                data_fim: format(event.dateEnd, "yyyy-MM-dd"),
                 numOfertasDiarias: event.diaryOffers,
             });
             console.log("Event added:", response.data);
             await getEvents(); // Refresh the list after adding
         } catch (error) {
+            alert("Erro ao atualizar evento. Verifique os dados e tente novamente.");
             console.error("Error adding event:", error);
         }
     }
@@ -69,6 +73,7 @@ export const useEventos = () => {
             await getEvents(); // Refresh the list after deleting
         }
         catch (error) {
+            alert("Erro ao excluir evento. Tente novamente.");
             console.error("Error deleting event:", error);
         }
     }

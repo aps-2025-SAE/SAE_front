@@ -1,6 +1,8 @@
 import { AppSidebar } from "@/components/AppSidebar"
+import { useAuth } from "@/context/AuthContext";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Sidebar */}
@@ -22,7 +24,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-medium">U</span>
                   </div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Usuário</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{user?.nome || "Usuário"}</span>
                 </div>
               </div>
             </div>
