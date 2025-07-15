@@ -3,6 +3,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 
+const addHourToDate = (date: any) => {
+    const newDate = new Date(date);
+    newDate.setHours(newDate.getHours() + 5); // Adiciona 3 horas
+    return newDate;
+}
+
 export const useEventos = () => {
     const [events, setEvents] = useState<Event[]>([]);
 
@@ -19,8 +25,8 @@ export const useEventos = () => {
                 title: evento.tipo,
                 budget: evento.valor,
                 description: evento.descricao,
-                dateInit: new Date(evento.data_inicio).toISOString(),
-                dateEnd: new Date(evento.data_fim).toISOString(),
+                dateInit: addHourToDate(evento.data_inicio),
+                dateEnd: addHourToDate(evento.data_fim),
                 diaryOffers: evento.numOfertasDiarias
             } as Event)));
 
@@ -31,6 +37,14 @@ export const useEventos = () => {
 
 
     const addEvent = async (event: Event) => {
+
+        const existingEvent = events.find(e => e.title === event.title);
+
+        if (existingEvent) {
+            alert("Evento já cadastrado.");
+            return;
+        }
+
         try {
             const response = await axios.post<Event>("https://saeback-production.up.railway.app/api/eventos", {
                 tipo: event.title,
@@ -49,6 +63,13 @@ export const useEventos = () => {
     }
 
     const updateEvent = async (id: string, event: Event) => {
+        const existingEvent = events.find(e => e.title === event.title && e.id !== id);
+
+        if (existingEvent) {
+            alert("Evento já cadastrado.");
+            return;
+        }
+
         try {
             const response = await axios.put<Event>(`https://saeback-production.up.railway.app/api/eventos/${id}`, {
                 tipo: event.title,
