@@ -1,33 +1,42 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
-
+import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Calendar } from 'lucide-react';
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const { login, isLoading } = useAuth();
+    const [error, setError] = useState('');
+    const { login, isLoading, user } = useAuth();
+    const navigate = useNavigate();
+
+    // Se já está logado, redireciona
+    useEffect(() => {
+        if (user) {
+            navigate('/default');
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError('');
 
         if (!email || !password) {
-            alert('Por favor, preencha todos os campos');
+            setError('Por favor, preencha todos os campos');
             return;
         }
 
         const success = await login(email, password);
 
         if (success) {
-            alert('Login realizado com sucesso!');
+            navigate('/default');
         } else {
-            alert('Credenciais inválidas. Tente novamente.');
+            setError('Credenciais inválidas. Tente novamente.');
         }
     };
 
@@ -49,6 +58,12 @@ const LoginForm = () => {
 
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            {error && (
+                                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                    <p className="text-sm text-red-600">{error}</p>
+                                </div>
+                            )}
+
                             <div className="space-y-2">
                                 <Label htmlFor="email" className="text-sm font-medium text-gray-700">
                                     Login
@@ -93,8 +108,6 @@ const LoginForm = () => {
                                 {isLoading ? 'Entrando...' : 'Entrar'}
                             </Button>
                         </form>
-
-
                     </CardContent>
                 </Card>
             </div>

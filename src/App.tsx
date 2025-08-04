@@ -22,7 +22,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!user) {
-    return <LoginForm />;
+    return <Navigate to="/login" replace />;
   }
 
   return <Layout>{children}</Layout>;
@@ -31,7 +31,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/default" replace />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<LoginForm />} />
       <Route path="/default" element={
         <ProtectedRoute>
           <Default />
@@ -42,7 +43,6 @@ const AppRoutes = () => {
           <EventoPage />
         </ProtectedRoute>
       } />
-
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

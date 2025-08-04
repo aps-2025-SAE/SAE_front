@@ -1,14 +1,14 @@
-
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import {
-  Calendar
+  Calendar,
+  LogOut
 } from "lucide-react"
 import { useAuth } from "@/context/AuthContext";
 
 export function AppSidebar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   const menuItems = [
@@ -19,6 +19,10 @@ export function AppSidebar() {
     }
   ]
 
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <div className={`${isCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 h-screen flex flex-col`}>
       {/* Header do Sidebar */}
@@ -28,7 +32,6 @@ export function AppSidebar() {
             <a href="/default">
               Gestão de Eventos
             </a>
-
           </h2>
         )}
         <Button
@@ -71,19 +74,34 @@ export function AppSidebar() {
 
       {/* Footer do Sidebar */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'} gap-3`}>
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-medium">U</span>
+        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} gap-3`}>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-sm font-medium">
+                {user?.nome?.charAt(0).toUpperCase() || "U"}
+              </span>
+            </div>
+            {!isCollapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {user?.nome || "Usuário"}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  {user?.email || ""}
+                </p>
+              </div>
+            )}
           </div>
           {!isCollapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                Usuário
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                {user?.email || ""}
-              </p>
-            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              className="text-gray-500 hover:text-red-600"
+              title="Sair"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
           )}
         </div>
       </div>
