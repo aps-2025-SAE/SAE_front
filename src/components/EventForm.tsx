@@ -53,8 +53,8 @@ const EventForm: React.FC<EventFormProps> = ({
       description: event?.description || "",
       dateInit: event?.dateInit ? new Date(event.dateInit) : undefined,
       dateEnd: event?.dateEnd ? new Date(event.dateEnd) : undefined,
-      diaryOffers: event?.diaryOffers || 0,
-      budget: event?.budget || 0,
+      diaryOffers: event?.diaryOffers ?? 0,
+      budget: event?.budget ?? 0,
     },
   });
 
@@ -196,9 +196,9 @@ const EventForm: React.FC<EventFormProps> = ({
                     type="number"
                     step="1"
                     placeholder="0"
-                    {...field}
+                    value={field.value || ''}
                     onChange={(e) =>
-                      field.onChange(parseInt(e.target.value) || 0)
+                      field.onChange(e.target.value === '' ? 0 : parseInt(e.target.value))
                     }
                   />
                 </FormControl>
@@ -218,9 +218,9 @@ const EventForm: React.FC<EventFormProps> = ({
                     type="number"
                     step="0.01"
                     placeholder="0,00"
-                    {...field}
+                    value={field.value || ''}
                     onChange={(e) =>
-                      field.onChange(parseFloat(e.target.value) || 0)
+                      field.onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))
                     }
                   />
                 </FormControl>
