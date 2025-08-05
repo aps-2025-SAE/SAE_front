@@ -1,6 +1,7 @@
 import AlertConfirmation from "@/components/AlertConfirmation";
 import EventCard from "@/components/EventCard";
 import EventForm from "@/components/EventForm";
+import Toast from "@/components/Toast";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,10 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useEventos } from "@/hooks/useEventos";
 import type { Event } from "@/types";
-import { Calendar, Plus, CheckCircle, AlertCircle, X } from "lucide-react";
+import { Calendar, Plus } from "lucide-react";
 import { useState } from "react";
 
 function EventoPage() {
@@ -32,7 +32,6 @@ function EventoPage() {
   };
 
   const onDeleteEvent = (event: Event) => {
-    // Implement delete logic here
     setDeletingEvent(event);
   };
 
@@ -67,33 +66,16 @@ function EventoPage() {
 
   return (
     <div>
-      <div className="space-y-6">
-        {/* Message Alert */}
-        {message && (
-          <Alert className={`${messageType === 'success' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {messageType === 'success' ? (
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                ) : (
-                  <AlertCircle className="h-4 w-4 text-red-600" />
-                )}
-                <AlertDescription className={messageType === 'success' ? 'text-green-700' : 'text-red-700'}>
-                  {message}
-                </AlertDescription>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearMessage}
-                className="h-6 w-6 p-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </Alert>
-        )}
+      {/* Toast Notification */}
+      {message && messageType && (
+        <Toast
+          message={message}
+          type={messageType}
+          onClose={clearMessage}
+        />
+      )}
 
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>

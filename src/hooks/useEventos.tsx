@@ -22,11 +22,6 @@ export const useEventos = () => {
     const showMessage = (text: string, type: 'success' | 'error') => {
         setMessage(text);
         setMessageType(type);
-        // Auto clear message after 5 seconds
-        setTimeout(() => {
-            setMessage(null);
-            setMessageType(null);
-        }, 5000);
     };
 
     const clearMessage = () => {
