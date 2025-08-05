@@ -11,12 +11,31 @@ const addHourToDate = (date: any) => {
 
 export const useEventos = () => {
     const [events, setEvents] = useState<Event[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState<string | null>(null);
+    const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
 
     useEffect(() => {
         getEvents();
     }, [])
 
+    const showMessage = (text: string, type: 'success' | 'error') => {
+        setMessage(text);
+        setMessageType(type);
+        // Auto clear message after 5 seconds
+        setTimeout(() => {
+            setMessage(null);
+            setMessageType(null);
+        }, 5000);
+    };
+
+    const clearMessage = () => {
+        setMessage(null);
+        setMessageType(null);
+    };
+
     const getEvents = async () => {
+        setIsLoading(true);
         try {
             const response = await axios.get<any[]>("https://saeback-production.up.railway.app/api/eventos");
             console.log("Fetched events:", response.data);
@@ -29,22 +48,23 @@ export const useEventos = () => {
                 dateEnd: addHourToDate(evento.data_fim),
                 diaryOffers: evento.numOfertasDiarias
             } as Event)));
-
         } catch (error) {
             console.error("Error fetching events:", error);
+            showMessage("Erro ao carregar eventos. Tente novamente.", 'error');
+        } finally {
+            setIsLoading(false);
         }
     }
 
-
-    const addEvent = async (event: Event) => {
-
+    const addEvent = async (event: Event): Promise<boolean> => {
         const existingEvent = events.find(e => e.title === event.title);
 
         if (existingEvent) {
-            alert("Evento já cadastrado.");
-            return;
+            showMessage("Evento já cadastrado.", 'error');
+            return false;
         }
 
+        setIsLoading(true);
         try {
             const response = await axios.post<Event>("https://saeback-production.up.railway.app/api/eventos", {
                 tipo: event.title,
@@ -55,21 +75,27 @@ export const useEventos = () => {
                 numOfertasDiarias: event.diaryOffers,
             });
             console.log("Event added:", response.data);
-            await getEvents(); // Refresh the list after adding
+            await getEvents();
+            showMessage("Evento criado com sucesso!", 'success');
+            return true;
         } catch (error) {
-            alert("Erro ao adicionar evento. Verifique os dados e tente novamente.");
             console.error("Error adding event:", error);
+            showMessage("Erro ao adicionar evento. Verifique os dados e tente novamente.", 'error');
+            return false;
+        } finally {
+            setIsLoading(false);
         }
     }
 
-    const updateEvent = async (id: string, event: Event) => {
+    const updateEvent = async (id: string, event: Event): Promise<boolean> => {
         const existingEvent = events.find(e => e.title === event.title && e.id !== id);
 
         if (existingEvent) {
-            alert("Evento já cadastrado.");
-            return;
+            showMessage("Evento já cadastrado.", 'error');
+            return false;
         }
 
+        setIsLoading(true);
         try {
             const response = await axios.put<Event>(`https://saeback-production.up.railway.app/api/eventos/${id}`, {
                 tipo: event.title,
@@ -79,31 +105,45 @@ export const useEventos = () => {
                 data_fim: format(event.dateEnd, "yyyy-MM-dd"),
                 numOfertasDiarias: event.diaryOffers,
             });
-            console.log("Event added:", response.data);
-            await getEvents(); // Refresh the list after adding
+            console.log("Event updated:", response.data);
+            await getEvents();
+            showMessage("Evento atualizado com sucesso!", 'success');
+            return true;
         } catch (error) {
-            alert("Erro ao atualizar evento. Verifique os dados e tente novamente.");
-            console.error("Error adding event:", error);
+            console.error("Error updating event:", error);
+            showMessage("Erro ao atualizar evento. Verifique os dados e tente novamente.", 'error');
+            return false;
+        } finally {
+            setIsLoading(false);
         }
     }
 
-    const deleteEvent = async (id: string) => {
+    const deleteEvent = async (id: string): Promise<boolean> => {
+        setIsLoading(true);
         try {
             await axios.delete(`https://saeback-production.up.railway.app/api/eventos/${id}`);
             console.log("Event deleted:", id);
-            await getEvents(); // Refresh the list after deleting
-        }
-        catch (error) {
-            alert("Erro ao excluir evento. Tente novamente.");
+            await getEvents();
+            showMessage("Evento excluído com sucesso!", 'success');
+            return true;
+        } catch (error) {
             console.error("Error deleting event:", error);
+            showMessage("Erro ao excluir evento. Tente novamente.", 'error');
+            return false;
+        } finally {
+            setIsLoading(false);
         }
     }
 
     return {
         events,
+        isLoading,
+        message,
+        messageType,
         getEvents,
         addEvent,
         updateEvent,
-        deleteEvent
+        deleteEvent,
+        clearMessage
     }
 }
