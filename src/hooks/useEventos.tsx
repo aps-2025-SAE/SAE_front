@@ -37,11 +37,11 @@ export const useEventos = () => {
             setEvents(response.data.map(evento => ({
                 id: evento.id,
                 title: evento.tipo,
-                budget: evento.valor,
+                budget: isNaN(parseFloat(evento.valor)) ? 0 : Math.max(0, parseFloat(evento.valor)),
                 description: evento.descricao,
                 dateInit: addHourToDate(evento.data_inicio),
                 dateEnd: addHourToDate(evento.data_fim),
-                diaryOffers: evento.numOfertasDiarias
+                diaryOffers: isNaN(parseInt(evento.numOfertasDiarias)) ? 0 : Math.max(0, parseInt(evento.numOfertasDiarias))
             } as Event)));
         } catch (error) {
             console.error("Error fetching events:", error);
@@ -59,15 +59,20 @@ export const useEventos = () => {
             return false;
         }
 
+        if (!event.budget || isNaN(event.budget) || event.budget <= 0) {
+            showMessage("Valor do orçamento deve ser maior que zero.", 'error');
+            return false;
+        }
+
         setIsLoading(true);
         try {
             const response = await axios.post<Event>("https://saeback-production.up.railway.app/api/eventos", {
                 tipo: event.title,
-                valor: event.budget,
+                valor: Math.round(event.budget * 100) / 100, // Ensure 2 decimal places
                 descricao: event.description,
                 data_inicio: format(event.dateInit, "yyyy-MM-dd"),
                 data_fim: format(event.dateEnd, "yyyy-MM-dd"),
-                numOfertasDiarias: event.diaryOffers,
+                numOfertasDiarias: Math.max(0, Math.floor(event.diaryOffers || 0)),
             });
             console.log("Event added:", response.data);
             await getEvents();
@@ -90,15 +95,21 @@ export const useEventos = () => {
             return false;
         }
 
+
+        if (!event.budget || isNaN(event.budget) || event.budget <= 0) {
+            showMessage("Valor do orçamento deve ser maior que zero.", 'error');
+            return false;
+        }
+
         setIsLoading(true);
         try {
             const response = await axios.put<Event>(`https://saeback-production.up.railway.app/api/eventos/${id}`, {
                 tipo: event.title,
-                valor: event.budget,
+                valor: Math.round(event.budget * 100) / 100, // Ensure 2 decimal places
                 descricao: event.description,
                 data_inicio: format(event.dateInit, "yyyy-MM-dd"),
                 data_fim: format(event.dateEnd, "yyyy-MM-dd"),
-                numOfertasDiarias: event.diaryOffers,
+                numOfertasDiarias: Math.max(0, Math.floor(event.diaryOffers || 0)),
             });
             console.log("Event updated:", response.data);
             await getEvents();

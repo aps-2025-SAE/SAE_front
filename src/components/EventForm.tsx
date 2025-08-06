@@ -28,7 +28,7 @@ const eventSchema = z.object({
   dateInit: z.date().min(1, "Data é obrigatória"),
   dateEnd: z.date().min(1, "Data de término é obrigatória"),
   diaryOffers: z.number().min(0, "Ofertas diárias devem ser zero ou mais"),
-  budget: z.number().min(0, "Valor deve ser positivo"),
+  budget: z.number().min(0.01, "Valor deve ser maior que zero").max(999999999, "Valor muito alto"),
 });
 
 type EventFormData = z.infer<typeof eventSchema>;
@@ -217,11 +217,28 @@ const EventForm: React.FC<EventFormProps> = ({
                   <Input
                     type="number"
                     step="0.01"
+                    min="0.01"
+                    max="999999999"
                     placeholder="0,00"
                     value={field.value || ''}
-                    onChange={(e) =>
-                      field.onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '' || value === '0') {
+                        field.onChange(0);
+                      } else {
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue) && numValue >= 0) {
+                          field.onChange(numValue);
+                        }
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const value = parseFloat(e.target.value);
+                      if (!isNaN(value) && value > 0) {
+                        // Format to 2 decimal places
+                        field.onChange(Math.round(value * 100) / 100);
+                      }
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
