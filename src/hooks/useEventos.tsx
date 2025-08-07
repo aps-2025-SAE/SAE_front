@@ -68,7 +68,7 @@ export const useEventos = () => {
         try {
             const response = await axios.post<Event>("https://saeback-production.up.railway.app/api/eventos", {
                 tipo: event.title,
-                valor: Math.round(event.budget * 100) / 100, // Ensure 2 decimal places
+                valor: Math.round(event.budget * 100) / 100,
                 descricao: event.description,
                 data_inicio: format(event.dateInit, "yyyy-MM-dd"),
                 data_fim: format(event.dateEnd, "yyyy-MM-dd"),

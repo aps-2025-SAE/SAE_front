@@ -96,8 +96,6 @@ const EventForm: React.FC<EventFormProps> = ({
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-
           <FormField
             control={form.control}
             name="dateInit"
@@ -128,9 +126,7 @@ const EventForm: React.FC<EventFormProps> = ({
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date()
-                      }
+                      disabled={(date) => date < new Date()}
                       captionLayout="dropdown"
                     />
                   </PopoverContent>
@@ -171,9 +167,7 @@ const EventForm: React.FC<EventFormProps> = ({
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date()
-                      }
+                      disabled={(date) => date < new Date()}
                       captionLayout="dropdown"
                     />
                   </PopoverContent>
@@ -183,7 +177,6 @@ const EventForm: React.FC<EventFormProps> = ({
               </FormItem>
             )}
           />
-
 
           <FormField
             control={form.control}
@@ -196,9 +189,13 @@ const EventForm: React.FC<EventFormProps> = ({
                     type="number"
                     step="1"
                     placeholder="0"
-                    value={field.value || ''}
+                    value={field.value || ""}
                     onChange={(e) =>
-                      field.onChange(e.target.value === '' ? 0 : parseInt(e.target.value))
+                      field.onChange(
+                        e.target.value === ""
+                          ? 0
+                          : parseInt(e.target.value)
+                      )
                     }
                   />
                 </FormControl>
@@ -220,10 +217,10 @@ const EventForm: React.FC<EventFormProps> = ({
                     min="0.01"
                     max="999999999"
                     placeholder="0,00"
-                    value={field.value || ''}
+                    value={field.value || ""}
                     onChange={(e) => {
                       const value = e.target.value;
-                      if (value === '' || value === '0') {
+                      if (value === "" || value === "0") {
                         field.onChange(0);
                       } else {
                         const numValue = parseFloat(value);
