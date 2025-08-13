@@ -3,7 +3,8 @@ import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import {
   Calendar,
-  LogOut
+  LogOut,
+  ClipboardList
 } from "lucide-react"
 import { useAuth } from "@/context/AuthContext";
 
@@ -16,6 +17,11 @@ export function AppSidebar() {
       icon: <Calendar className="w-5 h-5" />,
       label: "Eventos",
       href: "/eventos"
+    },
+    {
+      icon: <ClipboardList className="w-5 h-5" />,
+      label: "Solicitações",
+      href: "/solicitacoes"
     }
   ]
 

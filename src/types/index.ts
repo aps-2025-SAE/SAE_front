@@ -10,7 +10,16 @@ export interface Event {
 
 export interface EventRequest {
   id: string;
-  eventId?: string;
+  clientName: string;
+  clientEmail?: string;
   description: string;
+  eventDate: string | Date;
+  eventTime: string;
+  eventType: string;
   budget: number;
+  location?: string;
+  guestCount?: number;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt?: string | Date;
+  eventId?: string;
 }
