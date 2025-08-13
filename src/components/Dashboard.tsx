@@ -7,45 +7,52 @@ import AlertConfirmation from './AlertConfirmation';
 import Toast from './Toast';
 
 const Dashboard = () => {
-  const { pendingRequests, approveRequest, rejectRequest, isLoading, message, messageType, clearMessage } = useEventRequests();
+  const { 
+    pendingRequests, 
+    approvedRequests, 
+    approveRequest, 
+    rejectRequest, 
+    isLoading, 
+    message, 
+    messageType, 
+    clearMessage 
+  } = useEventRequests();
+  
   const [confirmAction, setConfirmAction] = useState<{
     type: 'approve' | 'reject';
     requestId: string;
     requestTitle: string;
   } | null>(null);
 
-  // Dados mockados estáticos para exemplo das métricas
+  // Dados dinâmicos baseados nos pedidos reais
   const dashboardStats = {
-    totalEvents: 45,
+    totalEvents: pendingRequests.length + approvedRequests.length,
     pendingRequests: pendingRequests.length,
-    upcomingEvents: 8,
-    monthlyRevenue: 125000,
-    eventsThisMonth: 15,
-    clientsCount: 78
+    upcomingEvents: approvedRequests.filter(req => new Date(req.eventDate) > new Date()).length,
+    monthlyRevenue: approvedRequests.reduce((total, req) => total + req.budget, 0),
+    eventsThisMonth: approvedRequests.filter(req => {
+      const eventDate = new Date(req.eventDate);
+      const now = new Date();
+      return eventDate.getMonth() === now.getMonth() && eventDate.getFullYear() === now.getFullYear();
+    }).length,
+    clientsCount: new Set([...pendingRequests, ...approvedRequests].map(req => req.clientEmail)).size
   };
 
-  const upcomingEvents = [
-    {
-      id: 1,
-      title: "Casamento Silva & Santos",
-      clientName: "Maria Silva",
-      date: "2025-08-15",
-      time: "18:00",
-      location: "Salão Cristal",
-      type: "wedding",
-      budget: 25000
-    },
-    {
-      id: 2,
-      title: "Evento Corporativo Tech",
-      clientName: "Empresa TechCorp",
-      date: "2025-07-25",
-      time: "14:00",
-      location: "Hotel Plaza",
-      type: "corporate",
-      budget: 15000
-    }
-  ];
+  // Usar eventos reais aprovados como próximos eventos
+  const upcomingEvents = approvedRequests
+    .filter(req => new Date(req.eventDate) > new Date()) // Apenas eventos futuros
+    .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime()) // Ordenar por data
+    .slice(0, 5) // Mostrar apenas os próximos 5
+    .map(req => ({
+      id: req.id,
+      title: `${req.description} - ${req.clientName}`,
+      clientName: req.clientName,
+      date: req.eventDate,
+      time: req.eventTime,
+      location: req.location,
+      type: req.eventType,
+      budget: req.budget
+    }));
 
   const handleApprove = (requestId: string, clientName: string) => {
     setConfirmAction({
@@ -87,13 +94,24 @@ const Dashboard = () => {
   const getEventTypeBadge = (type: string) => {
     const typeConfig = {
       wedding: { label: 'Casamento', color: 'bg-pink-100 text-pink-800' },
+      casamento: { label: 'Casamento', color: 'bg-pink-100 text-pink-800' },
       corporate: { label: 'Corporativo', color: 'bg-blue-100 text-blue-800' },
+      corporativo: { label: 'Corporativo', color: 'bg-blue-100 text-blue-800' },
       birthday: { label: 'Aniversário', color: 'bg-yellow-100 text-yellow-800' },
+      aniversário: { label: 'Aniversário', color: 'bg-yellow-100 text-yellow-800' },
+      'festa de aniversário': { label: 'Aniversário', color: 'bg-yellow-100 text-yellow-800' },
       anniversary: { label: 'Aniversário', color: 'bg-purple-100 text-purple-800' },
+      graduation: { label: 'Formatura', color: 'bg-green-100 text-green-800' },
+      formatura: { label: 'Formatura', color: 'bg-green-100 text-green-800' },
+      'festa de formatura': { label: 'Formatura', color: 'bg-green-100 text-green-800' },
+      conference: { label: 'Conferência', color: 'bg-indigo-100 text-indigo-800' },
+      conferência: { label: 'Conferência', color: 'bg-indigo-100 text-indigo-800' },
       other: { label: 'Outro', color: 'bg-gray-100 text-gray-800' },
+      outro: { label: 'Outro', color: 'bg-gray-100 text-gray-800' },
     };
     
-    return typeConfig[type as keyof typeof typeConfig] || typeConfig.other;
+    const normalizedType = type.toLowerCase();
+    return typeConfig[normalizedType as keyof typeof typeConfig] || typeConfig.other;
   };
 
   return (
@@ -206,7 +224,10 @@ const Dashboard = () => {
                 ))
               ) : (
                 <p className="text-gray-500 text-center py-4">
-                  Nenhum evento próximo
+                  {approvedRequests.length === 0 
+                    ? "Nenhum evento aprovado ainda" 
+                    : "Nenhum evento próximo agendado"
+                  }
                 </p>
               )}
             </div>

@@ -25,25 +25,26 @@ export const useEventRequests = () => {
     const getRequests = async () => {
         setIsLoading(true);
         try {
-            // Primeiro tenta buscar da API real
-            const response = await axios.get<any[]>("https://saeback-production.up.railway.app/api/solicitacoes");
+            // Buscar pedidos da API real
+            const response = await axios.get<any[]>("https://saeback-production.up.railway.app/api/admin/pedidos");
             console.log("Fetched requests:", response.data);
             
             // Mapear dados da API para o formato esperado
-            const mappedRequests = response.data.map(request => ({
-                id: request.id.toString(),
-                clientName: request.nome_cliente || request.clientName,
-                clientEmail: request.email_cliente || request.clientEmail,
-                description: request.descricao || request.description,
-                eventDate: new Date(request.data_evento || request.eventDate),
-                eventTime: request.horario_evento || request.eventTime,
-                eventType: request.tipo_evento || request.eventType,
-                budget: parseFloat(request.orcamento || request.budget) || 0,
-                location: request.local || request.location,
-                guestCount: parseInt(request.numero_convidados || request.guestCount) || 0,
-                status: request.status || 'pending',
-                createdAt: new Date(request.created_at || request.createdAt || Date.now()),
-                eventId: request.evento_id || request.eventId
+            const mappedRequests = response.data.map(pedido => ({
+                id: pedido.id.toString(),
+                clientName: pedido.cliente.nome,
+                clientEmail: pedido.cliente.email,
+                description: `Evento de ${pedido.evento.tipo}`,
+                eventDate: pedido.data_solicitada,
+                eventTime: pedido.horario,
+                eventType: pedido.evento.tipo.toLowerCase(),
+                budget: parseFloat(pedido.evento.valor) || 0,
+                location: pedido.endereco,
+                guestCount: parseInt(pedido.quantidade_pessoas) || 0,
+                status: pedido.status === 'pendente' ? 'pending' : 
+                       pedido.status === 'aprovado' ? 'approved' : 'rejected',
+                createdAt: new Date(pedido.created_at),
+                eventId: pedido.evento_id
             } as EventRequest));
             
             setRequests(mappedRequests);
@@ -105,7 +106,7 @@ export const useEventRequests = () => {
         setIsLoading(true);
         try {
             // Tentar aprovar via API
-            await axios.put(`https://saeback-production.up.railway.app/api/solicitacoes/${requestId}/aprovar`);
+            await axios.put(`https://saeback-production.up.railway.app/api/admin/pedidos/${requestId}/aprovar`);
             console.log("Request approved:", requestId);
             await getRequests();
             showMessage("Solicitação aprovada com sucesso!", 'success');
@@ -127,7 +128,7 @@ export const useEventRequests = () => {
         setIsLoading(true);
         try {
             // Tentar rejeitar via API
-            await axios.put(`https://saeback-production.up.railway.app/api/solicitacoes/${requestId}/rejeitar`, { 
+            await axios.put(`https://saeback-production.up.railway.app/api/admin/pedidos/${requestId}/rejeitar`, { 
                 motivo: reason 
             });
             console.log("Request rejected:", requestId);
