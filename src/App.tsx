@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import EventoPage from "./pages/Evento/EventoPage";
+import RequestsPage from "./pages/Requests/RequestsPage";
 import LoginForm from "./components/LoginForm";
 import NotFound from "./pages/NotFound";
 import Layout from "./pages/Layout";
@@ -41,6 +42,11 @@ const AppRoutes = () => {
       <Route path="/eventos" element={
         <ProtectedRoute>
           <EventoPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/solicitacoes" element={
+        <ProtectedRoute>
+          <RequestsPage />
         </ProtectedRoute>
       } />
       <Route path="*" element={<NotFound />} />

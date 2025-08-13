@@ -1,12 +1,23 @@
 
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, DollarSign, Clock, TrendingUp, CheckCircle } from 'lucide-react';
+import { useEventRequests } from '@/hooks/useEventRequests';
+import { useState } from 'react';
+import AlertConfirmation from './AlertConfirmation';
+import Toast from './Toast';
 
 const Dashboard = () => {
-  // Dados mockados estáticos para exemplo
+  const { pendingRequests, approveRequest, rejectRequest, isLoading, message, messageType, clearMessage } = useEventRequests();
+  const [confirmAction, setConfirmAction] = useState<{
+    type: 'approve' | 'reject';
+    requestId: string;
+    requestTitle: string;
+  } | null>(null);
+
+  // Dados mockados estáticos para exemplo das métricas
   const dashboardStats = {
     totalEvents: 45,
-    pendingRequests: 12,
+    pendingRequests: pendingRequests.length,
     upcomingEvents: 8,
     monthlyRevenue: 125000,
     eventsThisMonth: 15,
@@ -36,26 +47,42 @@ const Dashboard = () => {
     }
   ];
 
-  const pendingRequests = [
-    {
-      id: 1,
-      clientName: "João Oliveira",
-      description: "Festa de aniversário de 50 anos",
-      eventDate: "2025-09-10",
-      eventTime: "19:00",
-      eventType: "birthday",
-      budget: 8000
-    },
-    {
-      id: 2,
-      clientName: "Ana Costa",
-      description: "Evento de formatura",
-      eventDate: "2025-08-30",
-      eventTime: "20:00",
-      eventType: "other",
-      budget: 12000
+  const handleApprove = (requestId: string, clientName: string) => {
+    setConfirmAction({
+      type: 'approve',
+      requestId,
+      requestTitle: `Aprovar solicitação de ${clientName}`
+    });
+  };
+
+  const handleReject = (requestId: string, clientName: string) => {
+    setConfirmAction({
+      type: 'reject',
+      requestId,
+      requestTitle: `Rejeitar solicitação de ${clientName}`
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    if (!confirmAction) return;
+
+    const { type, requestId } = confirmAction;
+    let success = false;
+
+    if (type === 'approve') {
+      success = await approveRequest(requestId);
+    } else {
+      success = await rejectRequest(requestId);
     }
-  ];
+
+    if (success) {
+      setConfirmAction(null);
+    }
+  };
+
+  const handleCancelAction = () => {
+    setConfirmAction(null);
+  };
 
   const getEventTypeBadge = (type: string) => {
     const typeConfig = {
@@ -218,10 +245,20 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="flex gap-2 mt-3">
-                      <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                      <Button 
+                        size="sm" 
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => handleApprove(request.id, request.clientName)}
+                        disabled={isLoading}
+                      >
                         Aprovar
                       </Button>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleReject(request.id, request.clientName)}
+                        disabled={isLoading}
+                      >
                         Rejeitar
                       </Button>
                     </div>
@@ -236,6 +273,30 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {message && messageType && (
+        <Toast
+          message={message}
+          type={messageType}
+          onClose={clearMessage}
+        />
+      )}
+
+      {/* Confirmation Dialog */}
+      {confirmAction && (
+        <AlertConfirmation
+          title={confirmAction.requestTitle}
+          message={
+            confirmAction.type === 'approve' 
+              ? "Você tem certeza que deseja aprovar esta solicitação? O cliente será notificado."
+              : "Você tem certeza que deseja rejeitar esta solicitação? O cliente será notificado."
+          }
+          onConfirm={handleConfirmAction}
+          onCancel={handleCancelAction}
+          open={true}
+        />
+      )}
     </div>
   );
 };
